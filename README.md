@@ -17,14 +17,16 @@ Tameiki-Logger Socket.io Editionは、**FC2チャット（成人向けでない�
 1. このリポジトリをクローンします。
    ```bash
    git clone https://github.com/yourusername/Tameiki-Logger-Socketio.git
+   ```
 
 2. 必要な依存関係をインストールします。
     ```bash
     cd Tameiki-Logger-Socketio
     npm install
+    ```
 
-3.サーバーを起動します。
+3.サーバーを起動します。<br>
+    同梱のstart.batを起動してください。もしくは、
     ```bash
     npm start
-
-    もしくは、同梱のstart.batを起動してください。
+    ```
