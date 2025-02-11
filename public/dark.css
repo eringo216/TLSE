@@ -1,0 +1,61 @@
+/* ダークテーマ用のCSS */
+body {
+    color: #ffffff;
+    background-color: #222222;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+summary {
+    background-color: #101010;
+}
+
+.theme-transition * {
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+#settings {
+    background: #222222;
+}
+
+.content {
+    background: #222222;
+}
+
+input[type="range"] {
+    background-color: #101010;
+}
+
+::-webkit-slider-thumb {
+    background: #000000;
+}
+
+#console {
+    background-color: black;
+}
+
+input[type="text"], input[type="number"] {
+    background-color: black;
+    border: inset 3px #666;
+    color: white;
+}
+
+.view {
+    background: radial-gradient(#ffffff00, black);
+}
+
+#explain {
+    background: #000E;
+}
+
+.error{
+    color: crimson
+}
+
+.info{
+    color: blue
+}
+
+.container {
+    background: #222222;
+    border: outset 5px #222222;
+}

@@ -1,0 +1,58 @@
+/* ライトテーマ用のCSS */
+body {
+    color: #000000;
+    background-color: #d7d7d7;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+summary {
+    background-color: #e0e0e0;
+}
+
+.theme-transition * {
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+#settings {
+    background: #ffffff;
+}
+
+.contnt {
+    background: #ffffff;
+}
+
+input[type="range"] {
+    background-color: #e0e0e0;
+}
+
+::-webkit-slider-thumb {
+    background: #ffffff;
+}
+
+input[type="text"], input[type="number"] {
+    background-color: #e0e0e0;
+	border: inset 3px white;
+    color: black;
+}
+
+.view {
+    background: radial-gradient(#00000000, white);
+	border: inset 5px #ffffff;
+}
+
+#explain {
+    background: #ffffff;
+}
+
+.error{
+    color: maroon
+}
+
+.info{
+    color: navy
+}
+
+.container {
+    background: #ffffff;
+    border: outset 5px #ffffff;
+}

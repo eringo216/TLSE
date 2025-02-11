@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<!-- saved from url=(0068)http://nubesuko.ddns.net:8080/share/tameiki_logger/tameiki_logger.pl -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title>tameiki logger</title>
+<style>
+  body {
+		color: #ffffff;
+		background-color: #222222;
+  	}
+  
+  	.top {
+		float: inline-end;
+		display: flex;
+		overflow: hidden;
+		max-height: fit-content;
+		width:100%;
+  	}
+  
+  	label {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #101010;
+		white-space: nowrap;
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+  	}
+  
+  	.message {
+		display: flex;
+		align-items: center;
+		padding-left: 5px;
+		text-align: left;
+		text-shadow: 2px 2px 0px #000000;
+		margin: -1px 0;
+		border: solid 1px #666666;
+		border-top-color: #00000000;
+		border-radius: 8px;
+		width: 90vw;
+  	}
+
+	.other {
+		margin-left: auto;
+		font-size: 12px;
+		color: #888888;
+	}
+  
+  	.dup {
+		margin: 0px 10px;
+		font-size: 12px;
+		color: #888888;
+  	}
+  
+  	.acc {
+		margin: 0px 10px;
+		font-size: 10px;
+		color: #888888;
+  	}
+  
+  	#settings {
+		height: 70px;
+		width: 500px;
+		min-width: 500px;
+		border: outset 5px #444;
+		border-radius: 10px;
+		box-shadow: 0px 2px 5px black;
+		margin: 0px 0px 10px auto;
+  	}
+
+	#outputsettings{
+		flex-direction: column;
+		height: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
+	}
+
+	input[type="range"]{
+		-webkit-appearance: none;
+		border: inset 2px #222;
+		height: 0.3em;
+		border-radius: 5px;
+		background-color: #101010;
+	}
+
+	::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		width: 9px;
+		height: 20px;
+		background: #000000;
+		border-radius: 5px;
+		border: outset 1px #fff;
+	}
+  
+  	#inputarea {
+		width: fit-content;
+		display: flex;
+		border: outset 5px #444;
+		background: #222;
+		border-radius: 10px;
+		max-height: 2em;
+		box-shadow: 0px 2px 5px black;
+  	}
+
+	#sendname {
+		width: 7vw;
+	}
+
+	input[type="text"] {
+		-webkit-appearance: none;
+		color: white;
+		width: 30vw;
+		background-color: black;
+		border: inset 3px #666;
+		border-radius: 5px;
+		font-size:17px;
+		margin: 3px;
+	}
+	
+	#inputng {
+		width: 50%;
+		height: 0.8em;
+	}
+  
+  	#explain {
+		position:absolute;
+		padding: 2px;
+		font-size: 18px;
+		background: #000E;
+		border-radius: 5px;		
+  	}
+  
+  	#view {
+		align: left;
+		display: block;
+		overflow-y: scroll;
+		height: 70vh;
+		width: auto;
+		border-radius: 8px;
+		margin: 5px;
+		background: radial-gradient(#ffffff00, black);
+  	}
+  
+  	#idarea {
+		border: outset 5px #444;
+		margin: 0 10px;
+		height: fit-content;
+		border-radius: 10px;
+		box-shadow: 0px 2px 5px black;
+  	}
+
+	#inputid {
+		color: white;
+		width: 10vw;
+		background-color: black;
+		border: inset 3px #777;
+		border-radius: 8px;
+		
+	}
+  
+  	#lamparea {
+  	}
+
+	.url {
+		color: cornflowerblue;
+	}
+
+	#nomean {
+		margin-left: auto;
+	}
+
+	.options {
+		height: 1.5em;
+		width: fit-content;
+		white-space: nowrap;
+	}
+  
+  	.tukaen{
+  		font-size: 5em;
+  		animation-name: bound;
+  		animation-duration: 0.3s;
+  		animation-iteration-count: infinite;
+  		animation-direction: alternate;
+  		animation-timing-function: ease-out;
+  	}
+
+	.sendbtn {
+		background: #999;
+		color: #000;
+		border: outset 3px #666;
+		border-radius: 5px;
+	}
+
+	.sendbtn:active {
+		background: #666;
+		color: #FFF;
+		border: inset 3px #666;
+	}
+  
+  	@keyframes bound{
+  		from  { transform: translateY(5vh) scale(1,0.5); }
+  		to	{ transform:translateY(-5vh); }
+  	}
+</style><style type="text/css" id="operaUserStyle"></style></head>
+
+<body text="FFFFFF" bgcolor="222222">
+  <script language="javascript" src="./tameiki logger_files/ecl.js.ダウンロード"></script>
+  <script language="javascript">
+    	// 大部分引用:https://chat2.fc2.com/ch/ajax_fc2chat_normal.js
+    	// 書き換えたの:eringo
+    
+    	// settings
+		var view;
+		var inputid;
+		var inputng;
+    	var running_flag = "config";
+    	var unique_str = "";
+		var rate = 2160;
+    	td = new TextDecoder("EUC-JP")
+    	var get_script = "http://nubesuko.ddns.net:8080/share/tameiki_logger/proxy.cgi?url=" + encodeURIComponent("https://chat2.fc2.com/ch/ajax_read_normal.php")
+    	var config_script = "http://nubesuko.ddns.net:8080/share/tameiki_logger/proxy.cgi?url=" + encodeURIComponent("https://chat2.fc2.com/ch/ajax_read_config.php")
+    	var account = "21547364";
+		var modify_time = 0;
+		var newmsgs = [];
+		var oldmsgs = [];
+		var oldtopmsg = "";
+		var addmsgs = [];
+		var banana = 0;
+		var NGwords = [''];
+		var first = true;
+		var first1 = false;
+		var log = 0;
+		var dup = 1;
+		var message_main;
+		var message_time;
+		var failedmsg = 0;
+		const urlRegex = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/; //URL検出用
+    
+    	// main
+		document.addEventListener('DOMContentLoaded', () => {
+			view = document.getElementById("view");
+			inputid = document.getElementById("inputid");
+			inputng = document.getElementById("inputng");
+
+			readconfig();
+
+			restoreInputField();
+
+			kousin();
+
+			console.log("ぬべすこ");
+		});
+
+		//cookieのやつ
+		function restoreInputField() {
+			const cookies = document.cookie.split('; ');
+			for(const cookie of cookies) {
+				const [name, value] = cookie.split('=');
+				if (name === 'id') {
+					account = value;
+					inputid.value = value;
+				}
+				if (name === 'fc2chatname') {
+					document.getElementById("sendname").value = value;
+				}
+				if (name === 'NGwords') {
+					NGwords = decodeURIComponent(value).split(',');
+					inputng.value = decodeURIComponent(value);
+				}
+			}
+		}
+
+
+    	// メッセージ入力中にEnterが押されたとき
+    	function shoutKey()
+    	{
+    		// ENTERなら
+    		if (window.event.keyCode == 13)
+    		{
+    			Shout();
+    		}
+    	}
+    
+    	//らんぷ
+    	function changelamp(color){
+    		var lamparea = document.getElementById("lamparea");
+    		lamp = document.getElementById("lamp");
+    		switch(color){
+    			case 'green':
+    				if (lamp.src.includes("red")){
+    					lamparea.innerHTML = "<img src='/share/tameiki_logger/lampgreen.png' id='lamp'>";
+    				}
+    				break;
+    			case 'red':
+    				if (lamp.src.includes("green")){
+    					lamparea.innerHTML = "<img src='/share/tameiki_logger/lampred.png' id='lamp'>";
+    				}
+    				break;
+    		}
+    	}
+    
+    	//チャットID設定
+    	function setid(){
+
+    	}
+
+		//NGワード
+		function setNG(){
+			NGwords = inputng.value.split(",");
+			document.cookie = 'NGwords=' + encodeURIComponent(inputng.value) + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+		}
+
+    	// ログ取得
+    	function upDate(){
+
+    		var get_uri  = "http://nubesuko.ddns.net:8080/share/tameiki_logger/proxy.cgi?url=" + encodeURIComponent("https://chat2.fc2.com/ch/ajax_read_normal.php" + "?id=" + account
+    		+ "&unique_str=" + unique_str)
+    		
+    		fetch( get_uri ,headers={'Content-Type': 'text/html; charset=EUC-JP'})
+    		.then( response => {
+    			if (!response.ok){
+    				changelamp('red')
+    			} else {
+					return response.arrayBuffer();
+				}
+    		})
+    		.then( data => {
+    			message_time = td.decode(data).split("%%TIME%%");
+
+    			// 更新された場合
+    			if (message_time[0] > modify_time){
+					message_main = message_time.slice(1).join("%%TIME%%");
+					hantei();
+    			}
+    			changelamp('green');
+    		});
+        }
+
+		//ログ更新判定&表示
+		function hantei(){
+
+			if(first1){
+				first1 = false;
+				first = true;
+				return;
+			}
+
+			log = message_main.split("\n\n").join('');
+
+			newmsgs = log.split("<br />").slice(0,log.split("<br />").length-1).map(aaa => aaa = aaa.replace(/<\/?b>/g, ""));
+			
+
+			if (first) { // 初期ログ取得
+				addmsgs = newmsgs;
+			} else {
+				for (var i = 0; i < newmsgs.length; i++) {
+					if (newmsgs[i] === oldmsgs[0]) {
+						console.log('i' + i);
+						if (newmsgs.length < 3) {
+							addmsgs = newmsgs.slice(0, newmsgs.length - oldmsgs.length);
+						}
+						for (var j = 1; j < oldmsgs.length; j++) {
+							if (newmsgs[i + j] !== oldmsgs[j]) {
+								break;
+							} else if (i + j === Math.floor(newmsgs.length * 0.7)) {
+								console.log('i' + i + 'j' + j);
+								addmsgs = newmsgs.slice(0, i);
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			//表示
+			for(var i = addmsgs.length - 1; i >= 0; i--){
+
+				//NGワード検出
+				if (NGwords[0] !== ''){
+					if (NGwords.every(NGword => addmsgs[i].match(NGword))){
+					continue;
+					}
+				}
+				//連投検出
+				if (addmsgs.every(msg => msg === oldmsgs[0])){
+
+					oldtopmsg = oldmsgs[0];
+
+					dup += newmsgs.slice(0,newmsgs.indexOf(oldtopmsg)+1).filter(v => v == oldtopmsg).length
+					console.log(newmsgs.slice(0,newmsgs.indexOf(oldtopmsg)+1));
+
+					if (document.getElementsByClassName('message')[0].childElementCount <= 1 && document.getElementsByClassName("message")[0].children[0].tagName !== "A"){
+						document.getElementsByClassName('other')[0].insertAdjacentHTML('beforeBegin', '<p class="dup">x' + dup + '</p>');
+					} else {
+						document.getElementsByClassName('message')[0].children[0].textContent = `x${dup}`;
+					}
+					continue;
+				} else {
+					dup = 1;
+				}
+
+				var time = new Date();
+
+				var localtime = time.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'});
+
+				var msg = '<div class = "message">' + addmsgs[i] + '<div class="other">' + '<b class = "time">' + localtime + '</b>' + '<b class="acc">' + account + '</b>' + '</div>' + '</div>';
+
+				if (addmsgs[i].match(urlRegex)){
+
+					view.insertAdjacentHTML('afterbegin',msg.replace(urlRegex,"<a href='$1' target='_blank'>$1</a>"));
+
+				} else {
+
+					view.insertAdjacentHTML('afterbegin',msg);
+
+				}
+
+			}
+						
+			oldmsgs = newmsgs;
+
+			addmsgs = [];
+
+			modify_time = message_time[0];
+
+			if (first){
+				first = false;
+			}
+
+		}
+    	
+    	// 書き込み
+    	function Shout()
+    	{
+    		// 入力内容
+    		var name    = document.getElementById("sendname").value;
+    		var message = document.getElementById("sendmsg").value;
+
+			document.cookie = 'fc2chatname=' + name + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+    				
+    		// 発言入力クリア
+			const autoclear = document.querySelector('#autoclear');
+			if (autoclear.checked){
+				document.getElementById("sendmsg").value = "";
+			}
+    
+    		var put_uri  = "http://nubesuko.ddns.net:8080/share/tameiki_logger/proxy.cgi?url=" + encodeURIComponent("https://chat2.fc2.com/ch/ajax_write.php" + "?id=" + account
+    		+ "&count=" + "100" + "&unique_str=" + unique_str);
+    		
+    		const revtext = document.querySelector('#revtext');
+    
+    			if (revtext.checked){
+    				put_uri += "%26name%3D" + "%2526%25238238%253B" + encodeURIComponent(EscapeEUCJP(name));
+    			} else {
+    				put_uri += "%26name%3D" + encodeURIComponent(EscapeEUCJP(name));
+    			}
+    			put_uri += "%26comment%3D" + encodeURIComponent(EscapeEUCJP(message));
+    			
+    		fetch(put_uri,headers={'Content-Type': 'text/html; charset=EUC-JP'})
+    		.then(response => {
+    			changelamp('green');
+    			if (!response.ok){
+    				changelamp('red');
+    			}
+    		});
+    	}
+    
+    	// 文字サイズ変更
+    	function changetextsize(){
+    		var textsize = document.getElementById("textsize").value;
+    		view.setAttribute("style", `font-size:${textsize}px`);
+    	}
+
+		// 更新レート
+		function changerate(){
+			rate = document.getElementById("rate").value;
+		}
+    
+		//チャットの設定読むやつ
+    	function readconfig(){			
+    		fetch(`https://corsproxy.io/?url=https://chat2.fc2.com/ch/ajax_read_config.php?uid=${account}`,headers={'Content-Type': 'text/html; charset=EUC-JP'})
+    		.then( response => {
+				if (!response.ok){
+    				changelamp('red');
+					readconfig();
+    			}
+				return response.arrayBuffer();
+    		})
+    		.then( data => {
+    			responseText = td.decode(data);
+    			// リターン文字列解析
+    			var config = responseText.split("&");
+    			var delete_ary = config[0].split("=");
+    			var count_ary  = config[1].split("=");
+    			var back_ary   = config[2].split("=");
+    			var server_ary = config[3].split("=");
+    			var unique_ary = config[4].split("=");
+    			
+    			// 設定データ保存
+    			delete_time = delete_ary[1];
+    			count       = count_ary[1];
+    			back        = back_ary[1];
+    			server_uri  = server_ary[1];
+    			unique_str  = unique_ary[1];
+    			
+    			// 設定ファイル読み込み終了
+    			running_flag = "";
+    			console.log("設定ファイル読み込み終了");
+    			changelamp('green');
+    		})
+
+    	}
+    
+    	function tukaen(){
+    		view.insertAdjacentHTML('afterbegin','<div class="tukaen">いまはつかえましぇーーーーーん</div>');
+    	}
+
+  </script>
+  <div class="top">
+	<details id="explain">
+	  <summary>説明</summary>
+	  これを開いてる間、ひといきで送信されたメッセージが蓄積されます。<br>
+	  バックグラウンドだと一分に一回ほど更新されます。<br>
+	  リロードすると消えます<br>
+	  文字サイズ:12~30px<br>
+	  更新速度:2.16~10秒 重い時に使って下さい<br>
+	  idは21547364(ひといき),5554406(フラゲ),36568320(私のやつ)<br>
+	  NGワードは「,」で区切ってください。
+	</details>
+    <div id="settings">
+		<label>表示設定</label>
+        <div id="outputsettings">
+          <div class="options"><input type="range" min="12" max="30" step="1" id="textsize" value="12" oninput="changetextsize()">文字サイズ</div>
+          <div class="options"><input type="range" min="2160" max="10000" step="1960" id="rate" value="2160" oninput="changerate()">更新速度</div>
+		  <div class="options"><input type="text" id="inputng" oninput="setNG()">NGワード</div>
+        </div>
+	  </div><table>
+      
+    </table>
+    <div id="idarea"> <label id="viewid">チャットID:</label> <input type="text" id="inputid" value="21547364"> <input type="button" class="sendbtn" value="設定" onclick="setid()"> </div>
+    <div id="lamparea"> <img src="./tameiki logger_files/lampgreen.png" id="lamp"> </div>
+  </div>
+   <br>
+  <div id="inputarea"> <input type="text" id="sendname"> <input type="text" id="sendmsg" onkeypress="shoutKey()"> <input type="button" class="sendbtn" value="送信" onclick="Shout()"> <div class="options"><input type="checkbox" id="revtext">文字反転<input type="checkbox" id="autoclear" checked="">自動消去</div></div>
+  <div id="view" style="font-size:17px"></div>
+  <input type="button" id="nomean" value="特に意味のないボタン" onclick="tukaen();">
+  <p>created by eringo216</p>
+ 
+ 
+<deepl-input-controller><template shadowrootmode="open"><link rel="stylesheet" href="chrome-extension://cofdbpoegempjloogbagkncekinflcnj/build/content.css"><div dir="ltr"><div class="dl-input-translation-container svelte-95aucy"><div></div></div></div></template></deepl-input-controller></body></html>

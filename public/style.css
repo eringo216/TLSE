@@ -1,0 +1,237 @@
+/* 共通部分 (色以外) */
+.top {
+    float: inline-end;
+    display: flex;
+    overflow: hidden;
+    height: 50px;
+    width: 100%;
+}
+
+summary {
+    padding-left: 30px;
+    list-style: none;
+    box-sizing: border-box;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    white-space: nowrap;
+    border-radius: 5px;
+}
+
+summary::before {
+    content: "➤";  /* 初期状態の矢印 */
+    position: absolute;
+    left: 5px;
+    transition: transform 0.3s ease;
+    transform: rotate(0deg);  /* デフォルトは右向き */
+}
+
+details[open] summary {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+details[open] summary::before {
+    transform: rotate(90deg);  /* 開いたら下向きに回転 */
+}
+
+details[open] .content {
+    max-height: 100px;  /* 開いたときに最大高さを設定 */
+}
+
+#explain {
+    z-index: 10;
+    position: absolute;
+    padding: 2px;
+    font-size: 18px;
+    background: #000E;
+    border-radius: 5px;
+}
+
+.message {
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+    text-align: left;
+    margin: -1px 0;
+    border-bottom: solid 1px #666;
+    width: 90vw;
+}
+
+.options {
+    display: flex;
+    align-items: center; /* ラベルと入力の縦方向の位置を揃える */
+    margin: 5px;
+}
+
+.options label {
+    width: 100px; /* ラベルの幅を固定 */
+    margin-right: 10px; /* ラベルと入力フィールドの間隔 */
+}
+
+.options input,
+.options button {
+    flex-grow: 1; /* 入力フィールドとボタンを横に広げて揃える */
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+#textsize {
+    width: 100%; /* range の幅を100%にして親要素に合わせる */
+}
+
+.other {
+    margin-left: auto;
+    font-size: 12px;
+}
+
+.dup {
+    margin: 0px 10px;
+    font-size: 12px;
+}
+
+.acc {
+    margin: 0px 10px;
+    font-size: 10px;
+}
+
+.container {
+    min-width: max-content;
+    border: outset 5px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px black;
+    margin: 5px;
+}
+
+#settings {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 5px auto;
+    width: 420px;
+    height: fit-content;
+}
+
+.content {
+    box-sizing: border-box;
+    display: table;
+    width: 100%;
+    padding: 5px;
+    border-radius: 8px;
+    max-height: 0;  /* 初期状態で閉じている */
+    transition: max-height 0.5s ease-out;  /* 伸び縮みのアニメーション */
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 8em;
+    border: inset 2px #aaa;
+    height: 0.3em;
+    border-radius: 5px;
+}
+
+::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 9px;
+    height: 20px;
+    background: #ffffff;
+    border-radius: 5px;
+    border: outset 1px #000;
+}
+
+#console {
+    height: 3em;
+    width: 100%;
+    overflow-y: auto;
+}
+
+#inputarea {
+    width: fit-content;
+    display: flex;
+}
+
+#sendname {
+    width: 7vw;
+}
+
+input[type="text"], input[type="number"] {
+    -webkit-appearance: none;
+    width: 30vw;
+    border-radius: 5px;
+    font-size: 17px;
+    margin: 3px;
+}
+
+#inputid {
+    width: 120px;
+}
+
+#inputng {
+    width: 50%;
+    height: 0.8em;
+}
+
+.view {
+    display: block;
+    overflow-y: scroll;
+    height: 70vh;
+    width: auto;
+    border: inset 5px #222222;
+    border-radius: 8px;
+    margin: 5px;
+}
+
+#idarea {
+    position: absolute;
+    right: 0;
+    width: 200px;
+    height: fit-content;
+}
+
+#bottom {
+    display: flex;
+}
+
+#dousetu {
+    margin-left: auto;
+}
+
+.url {
+    color: blue;
+}
+
+.options {
+    white-space: nowrap;
+}
+
+.tukaen {
+    font-size: 5em;
+    animation-name: bound;
+    animation-duration: 0.3s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: ease-out;
+}
+
+.sendbtn {
+    background: #adadad;
+    color: #000000;
+    border: outset 3px #adadad;
+    border-radius: 5px;
+}
+
+.sendbtn:active {
+    background: #333;
+    color: #fff;
+    border: inset 3px #ccc;
+}
+
+@keyframes bound {
+    from {
+        transform: translateY(5vh) scale(1, 0.5);
+    }
+    to {
+        transform: translateY(-5vh);
+    }
+}

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title>Tameiki-Logger Socket.io Edition</title>
+</head>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="dark.css" id="theme-style">
+<body text="FFFFFF" bgcolor="222222">
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+	const socket = io('http://nubesuko.ddns.net:666');
+	var chatid = 21547364;
+	var chatview;
+	var inputid;
+	var inputng;
+	var NGwords;
+	var dousetu;
+	var themeStyle;
+
+
+	//読み込み時
+	document.addEventListener('DOMContentLoaded', () => {
+		chatview = document.getElementById("chatview");
+		idview = document.getElementById("idview");
+		eventview = document.getElementById("console");
+		inputid = document.getElementById("inputid");
+		inputng = document.getElementById("inputng");
+		dousetu = document.getElementById("dousetu");
+		themeStyle = document.getElementById('theme-style');
+		restoreInputField();
+	});
+
+	//ログ受信
+	socket.on('fc2chatlog', (newmsgs,shoutedtime) => {
+		const localtime = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'});
+
+		if (NGwords){
+			if (!NGwords.some(NGword => newmsgs.match(NGword))){
+				const msg = '<div class = "message">' + newmsgs + '<div class="other">' + '<b class = "time">' + localtime + '</b>' + '<b class="acc">' + chatid + '</b>' + '</div>' + '</div>'
+				chatview.insertAdjacentHTML('afterbegin',msg);
+			}
+		} else {
+			const msg = '<div class = "message">' + newmsgs + '<div class="other">' + '<b class = "time">' + localtime + '</b>' + '<b class="acc">' + chatid + '</b>' + '</div>' + '</div>'
+			chatview.insertAdjacentHTML('afterbegin',msg);
+		}
+		console.log(newmsgs)
+	})
+
+	socket.on('dup', (dup) => {
+		if (document.getElementsByClassName('message')[0].childElementCount <= 1 && document.getElementsByClassName("message")[0].children[0].tagName !== "A"){
+			document.getElementsByClassName('other')[0].insertAdjacentHTML('beforeBegin', '<p class="dup">x' + dup + '</p>');
+		} else {
+			document.getElementsByClassName('message')[0].children[0].textContent = `x${dup}`;
+		}
+	})
+
+	//どうせつ
+	socket.on('dousetu',(a,names) => {
+		dousetu.textContent = `接続者数:${a}(${names})`
+	})
+
+	//イベント表示
+	socket.on('event', (data) => {
+		console.log(data.msg);
+
+		// メッセージを色付きで挿入
+		const type = data.type === "error" ? 'error' : 'info'; // エラーメッセージは赤、それ以外は青
+		
+		eventview.insertAdjacentHTML('afterbegin', `<div class="${type}">${data.msg}<br></div>`);
+
+		if(Object.keys(data).includes("id")){
+			idview.textContent = `ID:${data.id}`;
+		}
+	});
+
+	//Cookie読み込み
+	function restoreInputField() {
+		const cookies = document.cookie.split('; ');
+		let idFound = false;
+		
+		for (const cookie of cookies) {
+			const [name, value] = cookie.split('=');
+			if (name === 'id') {
+				socket.emit('readconfig', parseInt(value));
+				chatid = value;
+				inputid.value = value;
+				idFound = true;
+			}
+			if (name === 'fc2chatname') {
+				document.getElementById("sendname").value = value;
+				socket.emit("sendname",value);
+			}
+			if (name === 'NGwords') {
+				if (value.length !== 0) {
+					NGwords = decodeURIComponent(value).split(',');
+					inputng.value = decodeURIComponent(value);
+				}
+			}
+			if (name === 'theme') {
+				themeStyle.href = value;
+			}
+			if (name === 'textsize') {
+				var textsize = document.getElementById("textsize");
+				chatview.setAttribute("style", `font-size:${value}px`);
+				textsize.value = value;
+			}
+		}
+
+		if (!idFound) {
+			console.log("id Cookieが見つかりませんっした");
+			socket.emit('readconfig', 21547364);
+		}
+	}
+
+
+	function shoutKey(){
+		// ENTERなら
+		if (window.event.keyCode == 13 && document.getElementById('sendmsg').value != '')
+		{
+			Shout();
+		}
+	}
+
+	function setId(){
+		document.cookie = 'id=' + inputid.value + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+		chatid = inputid.value;
+		if (inputid.value != null){
+			socket.emit('readconfig',parseInt(inputid.value));
+		}
+	}
+
+	//NGワード
+	function setNG(){
+		if(inputng.value.length != 0){
+			NGwords = inputng.value.split(",");
+		} else {
+			NGwords = [];
+		}
+		document.cookie = 'NGwords=' + encodeURIComponent(inputng.value) + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+	}
+
+	
+	//発言
+	function Shout(){
+		const bunkatsu = false;
+		const name    = document.getElementById('sendname').value;
+		const message = document.getElementById('sendmsg').value;
+		const alltext = [name,message];
+		document.cookie = 'fc2chatname=' + name + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+		const autoclear = document.querySelector('#autoclear');
+
+		 // データ量のカウント
+		let nameSize = 0;
+		let textSize = 0;
+
+		for (let i = 0; i < 2; i++) {
+			for (const char of alltext[i]) {
+				const codePoint = char.codePointAt(0);
+
+				// 絵文字の処理（データ量9）
+				if (char.match(/\p{Emoji_Presentation}/u)) {
+					if(i==0){
+						nameSize += 9;
+					}
+					if(i==1){
+						textSize += 9;
+					}
+				}
+				// 全角文字の処理（データ量2）
+				else if (codePoint > 0x7F) {
+					if(i==0){
+						nameSize += 2;
+					}
+					if(i==1){
+						textSize += 2;
+					}
+				}
+				// 半角文字の処理（データ量1）
+				else {
+					if(i==0){
+						nameSize += 1;
+					}
+					if(i==1){
+						textSize += 1;
+					}
+				}
+			}
+		}
+
+		if (!bunkatsu){
+			// データ量が100を超えたら送信不可
+			if (nameSize > 20) {
+				eventview.insertAdjacentHTML('afterbegin', `<div class="error">名前のデータ量が多いので送信できません。あと${20-nameSize}(半角1,全角2,絵文字9)減らしてください。<br></div>`);
+				return; // 処理を中断
+			}
+
+			if (textSize > 100) {
+				eventview.insertAdjacentHTML('afterbegin', `<div class="error">メッセージのデータ量が多いので送信できません。あと${100-textSize}(半角1,全角2,絵文字9)減らしてください。<br></div>`);
+				return; // 処理を中断
+			}
+
+			if(autoclear.checked){
+				document.getElementById('sendmsg').value = '';
+			}
+		}
+
+		socket.emit('shout',name,message);
+	}
+
+	// 文字サイズ変更
+	function changetextsize(){
+		var textsize = document.getElementById("textsize").value;
+		chatview.setAttribute("style", `font-size:${textsize}px`);
+		document.cookie = 'textsize=' + textsize + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+		localStorage.setItem('textsize', textsize);
+	}
+
+	function tukaen(){
+		chatview.insertAdjacentHTML('afterbegin','<div class="tukaen">いまはつかえましぇーーーーーん</div>');
+	}
+
+	function toggletheme(){
+		if (themeStyle.href.includes('dark')) {
+			themeStyle.href = 'light.css';
+			document.cookie = 'theme=' + 'light.css' + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+			localStorage.setItem('theme', 'light');
+		} else {
+			themeStyle.href = 'dark.css';
+			document.cookie = 'theme=' + 'dark.css' + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+			localStorage.setItem('theme', 'dark');
+		}
+	}
+	
+	</script>
+<div class="top">
+  	<details id="explain">
+    	<summary style="justify-content: left;">説明</summary>
+    	これを開いてる間、ひといきで送信されたメッセージが蓄積されます。<br>
+    	文字サイズ:12~30px<br>
+    	idは21547364(ひといき),5554406(フラゲ),36568320(私のやつ)
+  	</details>
+<details id="settings" class="container">
+	<summary>⚙️ 表示設定</summary>
+	<div class="content">
+		<div class="options">
+			<label for="textsize">文字サイズ</label>
+			<input type="range" min="12" max="30" step="1" id="textsize" value="12" oninput="changetextsize()">
+		</div>
+
+		<div class="options">
+			<label for="inputng">NGワード</label>
+			<input type="text" id="inputng">
+			<button class="sendbtn" onclick="setNG()">設定</button>
+		</div>
+
+		<div class="options">
+			<button class="sendbtn toggle-btn" onclick="toggletheme()">🌗 テーマ切り替え</button>
+		</div>
+	</div>
+</details>
+<details id="idarea" class="container">
+	<summary id="idview">ID:21547364</summary>
+	<div class="content">
+		<input type="number" id="inputid" value="21547364">
+		<input type="button" class="sendbtn" value="設定" onclick="setId()">
+	</div>
+</div><br>
+<div id="inputarea" class="container">
+	<input type="text" id="sendname">
+	<input type="text" id="sendmsg" onkeypress="shoutKey()">
+	<input type="button" class="sendbtn" value="送信" onclick="Shout()">
+	<div>
+		<input type="checkbox" id="revtext">文字反転
+	</div>
+	<div>
+		<input type="checkbox" id="autoclear" checked>自動消去
+	</div>
+</div>
+<div id="chatview" class="view" style="font-size:17px"></div>
+<div id="bottom">
+	<div id="console" class="view"></div>
+	<input type="button" id="nomean" class="sendbtn" style="display:none;" value="特に意味のないボタン" onclick="tukaen()">
+</div>
+<div>Made by eringo216</div><div id="dousetu">接続者数:</div>
+</body>
+</html>
