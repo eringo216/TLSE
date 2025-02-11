@@ -1,1 +1,1 @@
-<h3>Tameiki-Logger Socket.io Edition</h3>
+<h1>Tameiki-Logger Socket.io Edition</h1>
