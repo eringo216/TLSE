@@ -17,6 +17,7 @@
 	var NGwords;
 	var dousetu;
 	var themeStyle;
+	var olddup = 0;
 
 
 	//読み込み時
@@ -27,33 +28,46 @@
 		inputid = document.getElementById("inputid");
 		inputng = document.getElementById("inputng");
 		dousetu = document.getElementById("dousetu");
+		isgroup = document.getElementById("isgroup");
 		themeStyle = document.getElementById('theme-style');
 		restoreInputField();
 	});
 
-	//ログ受信
-	socket.on('fc2chatlog', (newmsgs,shoutedtime) => {
-		const localtime = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'});
+	//ログ受信[{ message: string, timestamp: Date , dup: suuji}]
+	socket.on('fc2chatlog', (chatMessages) => {
 
-		if (NGwords){
-			if (!NGwords.some(NGword => newmsgs.match(NGword))){
-				const msg = '<div class = "message">' + newmsgs + '<div class="other">' + '<b class = "time">' + localtime + '</b>' + '<b class="acc">' + chatid + '</b>' + '</div>' + '</div>'
-				chatview.insertAdjacentHTML('afterbegin',msg);
+		chatMessages.forEach(chatMsg => {
+			const message = chatMsg.message;
+			const timestamp = new Date(chatMsg.timestamp).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'});
+
+			// メッセージの表示部分
+			let msg = '<div class="message">' + message + 
+						'<div class="other">' + 
+						'<b class="time">' + timestamp + '</b>' + 
+						'</div>' + 
+						'</div>';
+			
+			// dupの表示
+			if (isgroup.checked && chatMsg.dup > 1) {
+				console.log(chatMsg.dup);
+				// 連投カウントを表示
+
+				if(document.getElementsByClassName('message')[0] && document.getElementsByClassName("message")[0].children[0].tagName !== "A"){
+					if (chatMsg.dup == 2){
+						document.getElementsByClassName('other')[0].insertAdjacentHTML('beforeBegin', '<p class="dup">x' + chatMsg.dup + '</p>');
+					} else {
+						document.getElementsByClassName('message')[0].children[0].textContent = `x${chatMsg.dup}`;
+						olddup = chatMsg.dup;
+					}
+				} 
+			} else {
+				// メッセージを表示
+				chatview.insertAdjacentHTML('afterbegin', msg);
+				console.log(message);
 			}
-		} else {
-			const msg = '<div class = "message">' + newmsgs + '<div class="other">' + '<b class = "time">' + localtime + '</b>' + '<b class="acc">' + chatid + '</b>' + '</div>' + '</div>'
-			chatview.insertAdjacentHTML('afterbegin',msg);
-		}
-		console.log(newmsgs)
-	})
+		});
+	});
 
-	socket.on('dup', (dup) => {
-		if (document.getElementsByClassName('message')[0].childElementCount <= 1 && document.getElementsByClassName("message")[0].children[0].tagName !== "A"){
-			document.getElementsByClassName('other')[0].insertAdjacentHTML('beforeBegin', '<p class="dup">x' + dup + '</p>');
-		} else {
-			document.getElementsByClassName('message')[0].children[0].textContent = `x${dup}`;
-		}
-	})
 
 	//どうせつ
 	socket.on('dousetu',(a,names) => {
@@ -104,6 +118,11 @@
 				var textsize = document.getElementById("textsize");
 				chatview.setAttribute("style", `font-size:${value}px`);
 				textsize.value = value;
+			}
+			if (name === 'isgroup') {
+				var isgroup = document.getElementById("isgroup");
+				isgroup.checked = value;
+				isgroup.value = value;
 			}
 		}
 
@@ -220,6 +239,13 @@
 		chatview.insertAdjacentHTML('afterbegin','<div class="tukaen">いまはつかえましぇーーーーーん</div>');
 	}
 
+	function toggleGroup(){
+		if(isgroup.checked){
+			isgroup.checked = !isgroup.checked;
+		}
+		document.cookie = 'isgroup=' + isgroup.checked + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/';
+	}
+
 	function toggletheme(){
 		if (themeStyle.href.includes('dark')) {
 			themeStyle.href = 'light.css';
@@ -252,6 +278,11 @@
 			<label for="inputng">NGワード</label>
 			<input type="text" id="inputng">
 			<button class="sendbtn" onclick="setNG()">設定</button>
+		</div>
+
+		<div class="options">
+			<label for="inputng">連投を纏める</label>
+			<input type="checkbox" id="isgroup" onclick="toggleGroup()">
 		</div>
 
 		<div class="options">

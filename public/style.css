@@ -7,6 +7,10 @@
     width: 100%;
 }
 
+a{
+    display:contents;
+}
+
 summary {
     padding-left: 30px;
     list-style: none;
@@ -54,9 +58,10 @@ details[open] .content {
     align-items: center;
     padding-left: 5px;
     text-align: left;
-    margin: -1px 0;
     border-bottom: solid 1px #666;
-    width: 90vw;
+    white-space: normal;      /* デフォルトの折り返し設定 */
+    word-wrap: break-word;    /* 長い単語も強制的に折り返す */
+    overflow-wrap: break-word; /* 新しいブラウザ向けの折り返し対応 */
 }
 
 .options {
@@ -66,7 +71,7 @@ details[open] .content {
 }
 
 .options label {
-    width: 100px; /* ラベルの幅を固定 */
+    min-width: 150px; /* ラベルの幅を固定 */
     margin-right: 10px; /* ラベルと入力フィールドの間隔 */
 }
 
