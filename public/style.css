@@ -7,6 +7,8 @@
     width: 100%;
 }
 
+
+
 a{
     display:contents;
 }
@@ -71,6 +73,15 @@ details[open] .content {
 }
 
 .options label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px; /* チェックボックスと文字の間隔 */
+    margin-right: 10px; /* ラベル同士の間隔 */
+}
+
+
+#settings label {
+    display: inline-flex;
     min-width: 150px; /* ラベルの幅を固定 */
     margin-right: 10px; /* ラベルと入力フィールドの間隔 */
 }
@@ -114,6 +125,8 @@ details[open] .content {
     left: 50%;
     transform: translateX(-50%);
     margin: 5px auto;
+    max-width: 420px;
+    min-width: 420px;
     width: 420px;
     height: fit-content;
 }
@@ -220,6 +233,8 @@ input[type="text"], input[type="number"] {
 }
 
 .sendbtn {
+    align-self: center;
+    height: fit-content;
     background: #adadad;
     color: #000000;
     border: outset 3px #adadad;

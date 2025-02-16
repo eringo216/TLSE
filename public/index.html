@@ -5,6 +5,7 @@
   <title>Tameiki-Logger Socket.io Edition</title>
 </head>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="checkbox.css">
 <link rel="stylesheet" href="dark.css" id="theme-style">
 <body text="FFFFFF" bgcolor="222222">
 	<script src="/socket.io/socket.io.js"></script>
@@ -12,6 +13,7 @@
 	const socket = io('http://nubesuko.ddns.net:666');
 	var chatid = 21547364;
 	var chatview;
+	var revtext;
 	var inputid;
 	var inputng;
 	var NGwords;
@@ -22,6 +24,7 @@
 
 	//読み込み時
 	document.addEventListener('DOMContentLoaded', () => {
+		revtext = document.getElementById("revtext");
 		chatview = document.getElementById("chatview");
 		idview = document.getElementById("idview");
 		eventview = document.getElementById("console");
@@ -30,6 +33,7 @@
 		dousetu = document.getElementById("dousetu");
 		isgroup = document.getElementById("isgroup");
 		themeStyle = document.getElementById('theme-style');
+		splitlong = document.getElementById("splitlong");
 		restoreInputField();
 	});
 
@@ -42,7 +46,7 @@
 			const timestamp = new Date(chatMsg.timestamp).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'});
 
 
-			if (NGwords[0] !== ''){
+			if (NGwords){
 				if (NGwords.some(NGword => message.includes(NGword))){
 					return;
 				}
@@ -232,7 +236,10 @@
 				document.getElementById('sendmsg').value = '';
 			}
 		}
-
+		
+		if(revtext.checked){
+			name = "&#8238;" + name;
+		}
 		socket.emit('shout',name,message);
 	}
 
@@ -263,6 +270,7 @@
 			localStorage.setItem('theme', 'dark');
 		}
 	}
+	
 	
 	</script>
 <div class="top">
@@ -307,12 +315,24 @@
 	<input type="text" id="sendname">
 	<input type="text" id="sendmsg" onkeypress="shoutKey()">
 	<input type="button" class="sendbtn" value="送信" onclick="Shout()">
-	<div>
-		<input type="checkbox" id="revtext">文字反転
+	<div class="options">
+		<label>
+			自動消去
+			<input type="checkbox" id="autoclear" checked>
+		</label>
 	</div>
-	<div>
-		<input type="checkbox" id="autoclear" checked>自動消去
+	<div class="options">
+		<label>
+			文字反転
+			<input type="checkbox" id="revtext">
+		</label>
 	</div>
+	<div class="options">
+		<label>
+			分割投稿
+			<input type="checkbox" id="splitlong">
+		</label>
+	</div>	
 </div>
 <div id="chatview" class="view" style="font-size:17px"></div>
 <div id="bottom">

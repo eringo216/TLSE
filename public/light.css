@@ -35,6 +35,20 @@ input[type="text"], input[type="number"] {
     color: black;
 }
 
+input[type="checkbox"] {
+    background: #e0e0e0;
+    border: inset 3px white;  /* 外向き枠線 */
+}
+
+input[type="checkbox"]::before {
+    background: #e0e0e0;
+    border: 3px outset white;
+}
+
+input[type="checkbox"]:checked {
+    background: #00ff22;  /* チェック時の背景色 */
+}
+
 .view {
     background: radial-gradient(#00000000, white);
 	border: inset 5px #ffffff;
