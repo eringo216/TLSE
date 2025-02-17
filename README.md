@@ -14,7 +14,7 @@ Tameiki-Logger Socket.io Editionは、**FC2チャット（chat2.fc2.com）**の*
 
 ## 🚀 インストール
 
-1. このリポジトリをクローンします。
+1. このリポジトリをクローンもしくはzipファイルを解凍します。
    ```bash
    git clone https://github.com/yourusername/Tameiki-Logger-Socketio.git
    ```
